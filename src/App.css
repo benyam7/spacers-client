@@ -31,3 +31,7 @@
   border: 0;
   border-radius: 5px;
 }
+
+.emoji-picker-react {
+  width: "100%";
+}

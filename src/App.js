@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import * as React from "react";
+import Picker from "emoji-picker-react";
 import "./App.css";
 import "./loading.css";
 import abi from "./utils/JoinSpace.json";
@@ -7,9 +8,10 @@ import abi from "./utils/JoinSpace.json";
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState();
   const [isLoading, setLoading] = React.useState(false);
-  const [totalSpacers, setTotalSpacers] = React.useState();
+  const [totalSpacersCount, setTotalSpacersCount] = React.useState();
+  const [spacers, setSpacers] = React.useState([]);
 
-  const contractAddress = "0x3B1D54a40068d50c11024852c9108509C18f7C0a";
+  const contractAddress = "0x2BDe0049c0f21eDa2435f6e057D7AaDF10c0d1bB";
   const contractABI = abi.abi;
 
   const checkIfWalletIsConnected = async () => {
@@ -25,7 +27,8 @@ export default function App() {
       if (accounts.length) {
         const account = accounts[0];
         setCurrentAccount(account);
-        console.log("first account", account);
+        console.log("current account", account);
+        getTotalSpacers();
       } else {
         console.log("we couldnt find any account");
       }
@@ -53,7 +56,7 @@ export default function App() {
     }
   };
 
-  const getTotalSpacers = async () => {
+  const getTotalSpacersCount = async () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -66,14 +69,43 @@ export default function App() {
         );
 
         let count = await joinSpaceContract.getTotalSpacers();
-        setTotalSpacers(count.toNumber());
+        setTotalSpacersCount(count.toNumber());
       }
     } catch (error) {
       console.log("Error when getting total spacers.", error);
     }
   };
 
-  const joinSpace = async () => {
+  const getTotalSpacers = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum); //ethers allows our frontend to talk to contract
+        const signer = provider.getSigner();
+        const joinSpaceContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+        const spacersArr = await joinSpaceContract.getSpacersArray();
+        console.log("Spacers not cleaned", spacersArr);
+        let spacersCleaned = [];
+        spacersArr.forEach((spacer) => {
+          spacersCleaned.push({
+            id: spacer.id,
+            countryEmoji: spacer.countryEmoji,
+            winStatus: spacer.status,
+            winType: spacer.winType,
+          });
+        });
+        setSpacers(spacersCleaned);
+      }
+    } catch (error) {
+      console.log("error when getting total spacers array", error);
+    }
+  };
+
+  const joinSpace = async (countryEmoji) => {
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -96,7 +128,7 @@ export default function App() {
         const joinSpaceTx = await joinSpaceContract.joinSpace({
           id: currentAccount,
           feelingEmoji: "happy", // figure how u can store feelin emojis
-          countryEmoji: "ET",
+          countryEmoji: countryEmoji,
           date: "Aug 19, 2022 at 6:40 PM",
           status: PENDING,
           winType: NOT_DETERMINED,
@@ -107,7 +139,7 @@ export default function App() {
         console.log("Minned --", joinSpaceTx.hash);
         count = await joinSpaceContract.getTotalSpacers();
         console.log("Total spacers -- ", count.toNumber());
-        setTotalSpacers(count.toNumber());
+        setTotalSpacersCount(count.toNumber());
         setLoading(false);
       } else {
         console.log("Eth obj doesn't exist");
@@ -120,8 +152,14 @@ export default function App() {
 
   React.useEffect(() => {
     checkIfWalletIsConnected();
-    getTotalSpacers();
+    getTotalSpacersCount();
   }, []);
+
+  const [chosenEmoji, setChosenEmoji] = React.useState(null);
+
+  const onEmojiClick = (event, emojiObject) => {
+    setChosenEmoji(emojiObject);
+  };
 
   return (
     <div className="mainContainer">
@@ -132,20 +170,51 @@ export default function App() {
           I am Benyam,connect your Ethereum wallet and join the space to win
           some cool NFT or ETH token!
         </div>
-        {totalSpacers && (
+        {totalSpacersCount && (
           <div className="bio">
-            {totalSpacers} Spacers joined the community so far!
+            {totalSpacersCount} Spacers joined the community so far!
           </div>
         )}
-        <button className="joinSpaceButton" onClick={joinSpace}>
-          Become a Spacer! 🚀
-        </button>
+
+        <div className="bio" style={{ fontWeight: "bold" }}>
+          Let us know where you're from and become a Spacer!
+        </div>
+
+        {chosenEmoji && (
+          <button
+            className="joinSpaceButton"
+            onClick={() => {
+              joinSpace(chosenEmoji.emoji);
+            }}
+          >
+            Become a Spacer! 🚀 from {chosenEmoji.emoji}
+          </button>
+        )}
         {isLoading && <Loading />}
         {!currentAccount && (
           <button className="joinSpaceButton" onClick={connectWallet}>
             Connect Wallet
           </button>
         )}
+
+        <Picker
+          onEmojiClick={onEmojiClick}
+          style={{ width: "100%" }}
+          groupVisibility={{
+            smileys_people: false,
+            animals_nature: false,
+            food_drink: false,
+            travel_places: false,
+            activities: false,
+            objects: false,
+            symbols: false,
+            recently_used: false,
+          }}
+          disableSkinTonePicker={true}
+          pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
+        />
+        <div>List of Spacers joined so far!</div>
+        <SpacersList spacers={spacers} />
       </div>
     </div>
   );
@@ -158,5 +227,28 @@ const Loading = () => {
       <div></div>
       <div></div>
     </div>
+  );
+};
+
+const SpacersList = (props) => {
+  const { spacers } = props;
+  return spacers ? (
+    spacers.map((spacer, index) => (
+      <div
+        key={index}
+        style={{
+          backgroundColor: "#cef",
+          marginTop: "16px",
+          padding: "8px",
+        }}
+      >
+        <div>Spacer Address: {spacer.id}</div>
+        <div>Country Emoji: {spacer.countryEmoji}</div>
+        <div>winStatus: {spacer.winStatus}</div>
+        <div>winType: {spacer.winType}</div>
+      </div>
+    ))
+  ) : (
+    <></>
   );
 };
