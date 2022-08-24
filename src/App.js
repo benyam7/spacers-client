@@ -63,6 +63,26 @@ export default function App() {
 
         let count = await joinSpaceContract.getTotalSpacers();
         console.log("Retrieved total spacers count", count.toNumber());
+
+        const PENDING = ethers.BigNumber.from("0"); // PENDING
+        console.log("ceck tis", signer);
+        const NOT_DETERMINED = ethers.BigNumber.from("2"); // NOT_DETERMINED
+
+        // join space
+        const joinSpaceTx = await joinSpaceContract.joinSpace({
+          id: currentAccount,
+          feelingEmoji: "happy", // figure how u can store feelin emojis
+          countryEmoji: "ET",
+          date: "Aug 19, 2022 at 6:40 PM",
+          status: PENDING,
+          winType: NOT_DETERMINED,
+        });
+        console.log("Minning...", joinSpaceTx.hash);
+
+        await joinSpaceTx.wait();
+        console.log("Minned --", joinSpaceTx.hash);
+        count = await joinSpaceContract.getTotalSpacers();
+        console.log("Total spacers -- ", count.toNumber());
       } else {
         console.log("Eth obj doesn't exist");
       }
