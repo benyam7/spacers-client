@@ -177,12 +177,17 @@ export default function App() {
             {totalSpacersCount} Spacers joined the community so far!
           </div>
         )}
+        {!currentAccount ? (
+          <div className="bio" style={{ fontWeight: "bold" }}>
+            Connect your wallet to represent your country!
+          </div>
+        ) : (
+          <div className="bio" style={{ fontWeight: "bold" }}>
+            Let us know where you're from and become a Spacer!
+          </div>
+        )}
 
-        <div className="bio" style={{ fontWeight: "bold" }}>
-          Let us know where you're from and become a Spacer!
-        </div>
-
-        {chosenEmoji && !isLoading && (
+        {chosenEmoji && !isLoading && currentAccount && (
           <button
             className="joinSpaceButton"
             onClick={() => {
@@ -217,8 +222,12 @@ export default function App() {
             pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
           />
         )}
-        <div>List of Spacers joined so far!</div>
-        <SpacersList spacers={spacers} />
+        {currentAccount && (
+          <>
+            <div>List of Spacers joined so far!</div>
+            <SpacersList spacers={spacers} />
+          </>
+        )}
       </div>
     </div>
   );
