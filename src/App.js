@@ -140,7 +140,9 @@ export default function App() {
         count = await joinSpaceContract.getTotalSpacers();
         console.log("Total spacers -- ", count.toNumber());
         setTotalSpacersCount(count.toNumber());
+        getTotalSpacers();
         setLoading(false);
+        setChosenEmoji(null);
       } else {
         console.log("Eth obj doesn't exist");
       }
@@ -180,7 +182,7 @@ export default function App() {
           Let us know where you're from and become a Spacer!
         </div>
 
-        {chosenEmoji && (
+        {chosenEmoji && !isLoading && (
           <button
             className="joinSpaceButton"
             onClick={() => {
@@ -197,22 +199,24 @@ export default function App() {
           </button>
         )}
 
-        <Picker
-          onEmojiClick={onEmojiClick}
-          style={{ width: "100%" }}
-          groupVisibility={{
-            smileys_people: false,
-            animals_nature: false,
-            food_drink: false,
-            travel_places: false,
-            activities: false,
-            objects: false,
-            symbols: false,
-            recently_used: false,
-          }}
-          disableSkinTonePicker={true}
-          pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
-        />
+        {!isLoading && (
+          <Picker
+            onEmojiClick={onEmojiClick}
+            style={{ width: "100%" }}
+            groupVisibility={{
+              smileys_people: false,
+              animals_nature: false,
+              food_drink: false,
+              travel_places: false,
+              activities: false,
+              objects: false,
+              symbols: false,
+              recently_used: false,
+            }}
+            disableSkinTonePicker={true}
+            pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
+          />
+        )}
         <div>List of Spacers joined so far!</div>
         <SpacersList spacers={spacers} />
       </div>
