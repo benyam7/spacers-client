@@ -1,10 +1,14 @@
 import { ethers } from "ethers";
 import * as React from "react";
 import "./App.css";
+import "./loading.css";
 import abi from "./utils/JoinSpace.json";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState();
+  const [isLoading, setLoading] = React.useState(false);
+  const [totalSpacers, setTotalSpacers] = React.useState();
+
   const contractAddress = "0x3B1D54a40068d50c11024852c9108509C18f7C0a";
   const contractABI = abi.abi;
 
@@ -49,7 +53,7 @@ export default function App() {
     }
   };
 
-  const totalSpacers = async () => {
+  const getTotalSpacers = async () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -62,10 +66,30 @@ export default function App() {
         );
 
         let count = await joinSpaceContract.getTotalSpacers();
+        setTotalSpacers(count.toNumber());
+      }
+    } catch (error) {
+      console.log("Error when getting total spacers.", error);
+    }
+  };
+
+  const joinSpace = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        setLoading(true);
+        const provider = new ethers.providers.Web3Provider(ethereum); //ethers allows our frontend to talk to contract
+        const signer = provider.getSigner();
+        const joinSpaceContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        let count = await joinSpaceContract.getTotalSpacers();
         console.log("Retrieved total spacers count", count.toNumber());
 
         const PENDING = ethers.BigNumber.from("0"); // PENDING
-        console.log("ceck tis", signer);
         const NOT_DETERMINED = ethers.BigNumber.from("2"); // NOT_DETERMINED
 
         // join space
@@ -83,19 +107,21 @@ export default function App() {
         console.log("Minned --", joinSpaceTx.hash);
         count = await joinSpaceContract.getTotalSpacers();
         console.log("Total spacers -- ", count.toNumber());
+        setTotalSpacers(count.toNumber());
+        setLoading(false);
       } else {
         console.log("Eth obj doesn't exist");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
 
   React.useEffect(() => {
     checkIfWalletIsConnected();
+    getTotalSpacers();
   }, []);
-
-  const joinSpace = () => {};
 
   return (
     <div className="mainContainer">
@@ -106,10 +132,15 @@ export default function App() {
           I am Benyam,connect your Ethereum wallet and join the space to win
           some cool NFT or ETH token!
         </div>
-
-        <button className="joinSpaceButton" onClick={totalSpacers}>
+        {totalSpacers && (
+          <div className="bio">
+            {totalSpacers} Spacers joined the community so far!
+          </div>
+        )}
+        <button className="joinSpaceButton" onClick={joinSpace}>
           Become a Spacer! 🚀
         </button>
+        {isLoading && <Loading />}
         {!currentAccount && (
           <button className="joinSpaceButton" onClick={connectWallet}>
             Connect Wallet
@@ -119,3 +150,13 @@ export default function App() {
     </div>
   );
 }
+
+const Loading = () => {
+  return (
+    <div className="loading">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  );
+};
