@@ -11,7 +11,7 @@ export default function App() {
   const [totalSpacersCount, setTotalSpacersCount] = React.useState();
   const [spacers, setSpacers] = React.useState([]);
 
-  const contractAddress = "0x2BDe0049c0f21eDa2435f6e057D7AaDF10c0d1bB";
+  const contractAddress = "0xf5b8366B64a091239c7854E3E92a932F1eA99DFa";
   const contractABI = abi.abi;
   const makeSureChainIdIsGoerli = async (ethereum) => {
     const provider = new ethers.providers.Web3Provider(ethereum);
