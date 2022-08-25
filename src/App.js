@@ -4,7 +4,7 @@ import Picker from "emoji-picker-react";
 import "./App.css";
 import "./loading.css";
 import abi from "./utils/JoinSpace.json";
-
+const GOERLI = "goerli";
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState();
   const [isLoading, setLoading] = React.useState(false);
@@ -13,14 +13,25 @@ export default function App() {
 
   const contractAddress = "0x2BDe0049c0f21eDa2435f6e057D7AaDF10c0d1bB";
   const contractABI = abi.abi;
-
+  const makeSureChainIdIsGoerli = async (ethereum) => {
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const { name } = await provider.getNetwork();
+    if (name !== GOERLI) {
+      console.log("name", name);
+      alert(
+        "Change your Wallet network to Goerli, otherwise functionality of the app won't work. :("
+      );
+    }
+  };
   const checkIfWalletIsConnected = async () => {
     try {
       const { ethereum } = window;
+
       if (!ethereum) {
         console.log("Make sure you have metamask!");
       } else {
         console.log("we got eth obj", ethereum);
+        makeSureChainIdIsGoerli(ethereum);
       }
       const accounts = await ethereum.request({ method: "eth_accounts" }); // see if we can access the accounts (this returns an array)
 
