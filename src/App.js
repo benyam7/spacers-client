@@ -48,6 +48,14 @@ export default function App() {
     }
   };
 
+  const listenToAccountChangesInMetaMask = () => {
+    const { ethereum } = window;
+    if (ethereum) {
+      ethereum.on("accountsChanged", function (accounts) {
+        setCurrentAccount(accounts[0]);
+      });
+    }
+  };
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -169,6 +177,7 @@ export default function App() {
   React.useEffect(() => {
     checkIfWalletIsConnected();
     getTotalSpacersCount();
+    listenToAccountChangesInMetaMask();
   }, []);
 
   const [chosenEmoji, setChosenEmoji] = React.useState(null);
