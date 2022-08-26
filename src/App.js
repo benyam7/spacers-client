@@ -11,7 +11,7 @@ export default function App() {
   const [totalSpacersCount, setTotalSpacersCount] = React.useState();
   const [spacers, setSpacers] = React.useState([]);
 
-  const contractAddress = "0xf5b8366B64a091239c7854E3E92a932F1eA99DFa";
+  const contractAddress = "0x7b79F43fD1Bf7BFFb51B44f0ceCFDc4d8E9DcEcc";
   const contractABI = abi.abi;
   const makeSureChainIdIsGoerli = async (ethereum) => {
     const provider = new ethers.providers.Web3Provider(ethereum);
@@ -136,14 +136,17 @@ export default function App() {
         const NOT_DETERMINED = ethers.BigNumber.from("2"); // NOT_DETERMINED
 
         // join space
-        const joinSpaceTx = await joinSpaceContract.joinSpace({
-          id: currentAccount,
-          feelingEmoji: "happy", // figure how u can store feelin emojis
-          countryEmoji: countryEmoji,
-          date: "Aug 19, 2022 at 6:40 PM",
-          status: PENDING,
-          winType: NOT_DETERMINED,
-        });
+        const joinSpaceTx = await joinSpaceContract.joinSpace(
+          {
+            id: currentAccount,
+            feelingEmoji: "happy", // figure how u can store feelin emojis
+            countryEmoji: countryEmoji,
+            date: "Aug 19, 2022 at 6:40 PM",
+            status: PENDING,
+            winType: NOT_DETERMINED,
+          },
+          { gasLimit: 300000 }
+        );
         console.log("Minning...", joinSpaceTx.hash);
 
         await joinSpaceTx.wait();
@@ -180,12 +183,12 @@ export default function App() {
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
         <div className="bio">
-          I am Benyam,connect your Ethereum wallet and join the space to win
-          some cool NFT or ETH token!
+          I am Benyam,connect your Ethereum wallet and join the club to win some
+          cool NFT or ETH token!
         </div>
         {totalSpacersCount && (
           <div className="bio">
-            {totalSpacersCount} Spacers joined the community so far!
+            {totalSpacersCount} Spacers joined the club so far!
           </div>
         )}
         {!currentAccount ? (
@@ -235,8 +238,14 @@ export default function App() {
         )}
         {currentAccount && (
           <>
-            <div>List of Spacers joined so far!</div>
-            <SpacersList spacers={spacers} />
+            <div>Spacers in the club!</div>
+            {spacers.length === 0 ? (
+              <div>
+                No one joined so far, well u got a chance to be first one!😅
+              </div>
+            ) : (
+              <SpacersList spacers={spacers} />
+            )}
           </>
         )}
       </div>
