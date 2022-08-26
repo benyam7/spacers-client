@@ -11,7 +11,7 @@ export default function App() {
   const [totalSpacersCount, setTotalSpacersCount] = React.useState();
   const [spacers, setSpacers] = React.useState([]);
 
-  const contractAddress = "0xf5b8366B64a091239c7854E3E92a932F1eA99DFa";
+  const contractAddress = "0x7Be56E467a986cAFFe4480ea5344621640340018";
   const contractABI = abi.abi;
   const makeSureChainIdIsGoerli = async (ethereum) => {
     const provider = new ethers.providers.Web3Provider(ethereum);
@@ -180,12 +180,12 @@ export default function App() {
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
         <div className="bio">
-          I am Benyam,connect your Ethereum wallet and join the space to win
-          some cool NFT or ETH token!
+          I am Benyam,connect your Ethereum wallet and join the club to win some
+          cool NFT or ETH token!
         </div>
         {totalSpacersCount && (
           <div className="bio">
-            {totalSpacersCount} Spacers joined the community so far!
+            {totalSpacersCount} Spacers joined the club so far!
           </div>
         )}
         {!currentAccount ? (
@@ -235,8 +235,14 @@ export default function App() {
         )}
         {currentAccount && (
           <>
-            <div>List of Spacers joined so far!</div>
-            <SpacersList spacers={spacers} />
+            <div>Spacers in the club!</div>
+            {spacers.length === 0 ? (
+              <div>
+                No one joined so far, well u got a chance to be first one!😅
+              </div>
+            ) : (
+              <SpacersList spacers={spacers} />
+            )}
           </>
         )}
       </div>
