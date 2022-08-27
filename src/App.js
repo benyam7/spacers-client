@@ -1,17 +1,19 @@
 import { ethers } from "ethers";
 import * as React from "react";
-import Picker from "emoji-picker-react";
-import Lottie from "react-lottie";
+
+import abi from "./utils/JoinSpace.json";
 
 import "./App.css";
 import "./background.css";
-import "./loading.css";
-import abi from "./utils/JoinSpace.json";
-import RocketScene from "./RocketScene";
-import animationData from "./utils/spacer-lottie.json";
-import { readWinStatus } from "./utils/winstatusConverter";
+
+import "./components/Loading";
+import RocketScene from "./components/RocketScene";
+import Loading from "./components/Loading";
+import SpacersList from "./components/SpacersList";
+import FlagPicker from "./components/FlagPicker";
 
 const GOERLI = "goerli";
+
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState();
   const [isLoading, setLoading] = React.useState(false);
@@ -63,6 +65,7 @@ export default function App() {
       });
     }
   };
+
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -199,14 +202,16 @@ export default function App() {
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
         <div className="bio">
-          I am Benyam,connect your Ethereum wallet and join the club to win some
-          cool NFT or ETH token!
+          I am Benyam, connect your Ethereum wallet and join the club to win
+          some cool NFT or ETH token!
         </div>
+
         {totalSpacersCount && (
           <div className="bio">
             {totalSpacersCount} Spacers joined the club so far!
           </div>
         )}
+
         {!currentAccount ? (
           <div className="bio" style={{ fontWeight: "bold" }}>
             Connect your wallet to represent your country!
@@ -228,34 +233,14 @@ export default function App() {
           </button>
         )}
         {isLoading && <Loading />}
+
         {!currentAccount && (
           <button className="joinSpaceButton" onClick={connectWallet}>
             Connect Wallet
           </button>
         )}
 
-        {!isLoading && (
-          <Picker
-            onEmojiClick={onEmojiClick}
-            style={{ width: "100%" }}
-            groupVisibility={{
-              smileys_people: false,
-              animals_nature: false,
-              food_drink: false,
-              travel_places: false,
-              activities: false,
-              objects: false,
-              symbols: false,
-              recently_used: false,
-            }}
-            disableSkinTonePicker={true}
-            pickerStyle={{
-              width: "100%",
-              marginTop: 40,
-              marginBottom: 40,
-            }}
-          />
-        )}
+        {!isLoading && <FlagPicker onEmojiClick={onEmojiClick} />}
 
         <RocketScene />
 
@@ -276,54 +261,3 @@ export default function App() {
     </div>
   );
 }
-
-const Loading = () => {
-  return (
-    <div className="loading">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  );
-};
-
-const SpacersList = (props) => {
-  const { spacers } = props;
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-  return spacers ? (
-    spacers.map((spacer, index) => (
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
-        <div
-          style={{
-            background: "linear-gradient(#cef, transparent)",
-            marginTop: "16px",
-            padding: "8px",
-          }}
-        >
-          <Lottie options={defaultOptions} height={100} width={100} />
-        </div>
-        <div
-          key={index}
-          style={{
-            background: "linear-gradient(#cef, transparent)",
-            marginTop: "16px",
-            padding: "8px",
-          }}
-        >
-          <div>Spacer : {spacer.id}</div>
-          <div>From: {spacer.countryEmoji}</div>
-          <div>Win status: {readWinStatus(spacer.winStatus)}</div>
-        </div>
-      </div>
-    ))
-  ) : (
-    <></>
-  );
-};

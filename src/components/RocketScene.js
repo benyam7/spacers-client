@@ -1,4 +1,4 @@
-import "./rocket.css";
+import "../rocket.css";
 import React from "react";
 import { useEffect } from "react";
 
