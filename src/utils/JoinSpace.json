@@ -47,6 +47,19 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "id",
+          "type": "address"
+        }
+      ],
+      "name": "NewWinner",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "getNFTIPFSLink",
       "outputs": [

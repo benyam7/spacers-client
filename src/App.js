@@ -285,7 +285,7 @@ export default function App() {
 
             {spacers.length === 0 ? (
               <div>
-                No one joined so far, well u got a chance to be first one!😅
+                No one joined so far, well, u got a chance to be first one!😅
               </div>
             ) : (
               <SpacersList spacers={spacers} />
