@@ -11,6 +11,7 @@ import RocketScene from "./components/RocketScene";
 import Loading from "./components/Loading";
 import SpacersList from "./components/SpacersList";
 import FlagPicker from "./components/FlagPicker";
+import { readWinStatus } from "./utils/winstatusConverter";
 
 const GOERLI = "goerli";
 
@@ -117,22 +118,56 @@ export default function App() {
           signer
         );
         const spacersArr = await joinSpaceContract.getSpacersArray();
-        console.log("Spacers not cleaned", spacersArr);
         let spacersCleaned = [];
         spacersArr.forEach((spacer) => {
           spacersCleaned.push({
             id: spacer.id,
             countryEmoji: spacer.countryEmoji,
             winStatus: spacer.status,
-            winType: spacer.winType,
           });
         });
         setSpacers(spacersCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
       console.log("error when getting total spacers array", error);
     }
   };
+
+  React.useEffect(() => {
+    let joinSpaceContract;
+
+    const onNewSpacer = (id, timestamp, countryEmoji) => {
+      console.log("NewSpacer", id, timestamp, countryEmoji);
+      setSpacers((prevState) => [
+        ...prevState,
+        {
+          id,
+          countryEmoji,
+          winStatus: readWinStatus(0), // TODO: change this as soon as you update your smart contract to emit win status as well.
+        },
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      joinSpaceContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      joinSpaceContract.on("NewSpacer", onNewSpacer);
+    }
+
+    return () => {
+      if (joinSpaceContract) {
+        joinSpaceContract.off("NewSpacer", onNewSpacer);
+      }
+    };
+  }, []);
 
   const joinSpace = async (countryEmoji) => {
     try {
@@ -202,8 +237,8 @@ export default function App() {
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
         <div className="bio">
-          I am Benyam, connect your Ethereum wallet and join the club to win
-          some cool NFT or ETH token!
+          I am Benyam, connect your Ethereum wallet and join the club to{" "}
+          <strong>win some cool NFT or ETH token!</strong>
         </div>
 
         {totalSpacersCount && (
