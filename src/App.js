@@ -195,7 +195,6 @@ export default function App() {
 
   return (
     <div className="mainContainer bg">
-      {/* <Background /> */}
       <div className="dataContainer">
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
