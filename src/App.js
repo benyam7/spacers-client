@@ -1,10 +1,15 @@
 import { ethers } from "ethers";
 import * as React from "react";
 import Picker from "emoji-picker-react";
+import Lottie from "react-lottie";
+
 import "./App.css";
+import "./background.css";
 import "./loading.css";
 import abi from "./utils/JoinSpace.json";
 import RocketScene from "./RocketScene";
+import animationData from "./utils/spacer-lottie.json";
+import { readWinStatus } from "./utils/winstatusConverter";
 
 const GOERLI = "goerli";
 export default function App() {
@@ -189,7 +194,8 @@ export default function App() {
   };
 
   return (
-    <div className="mainContainer">
+    <div className="mainContainer bg">
+      {/* <Background /> */}
       <div className="dataContainer">
         <div className="header">Hey Spacer! 🌌 🚀 ☄️</div>
 
@@ -244,7 +250,11 @@ export default function App() {
               recently_used: false,
             }}
             disableSkinTonePicker={true}
-            pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
+            pickerStyle={{
+              width: "100%",
+              marginTop: 40,
+              marginBottom: 40,
+            }}
           />
         )}
 
@@ -252,7 +262,8 @@ export default function App() {
 
         {currentAccount && (
           <>
-            <div>Spacers in the club!</div>
+            <div>The G's in the club!</div>
+
             {spacers.length === 0 ? (
               <div>
                 No one joined so far, well u got a chance to be first one!😅
@@ -279,20 +290,38 @@ const Loading = () => {
 
 const SpacersList = (props) => {
   const { spacers } = props;
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   return spacers ? (
     spacers.map((spacer, index) => (
-      <div
-        key={index}
-        style={{
-          backgroundColor: "#cef",
-          marginTop: "16px",
-          padding: "8px",
-        }}
-      >
-        <div>Spacer Address: {spacer.id}</div>
-        <div>Country Emoji: {spacer.countryEmoji}</div>
-        <div>winStatus: {spacer.winStatus}</div>
-        <div>winType: {spacer.winType}</div>
+      <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
+        <div
+          style={{
+            background: "linear-gradient(#cef, transparent)",
+            marginTop: "16px",
+            padding: "8px",
+          }}
+        >
+          <Lottie options={defaultOptions} height={100} width={100} />
+        </div>
+        <div
+          key={index}
+          style={{
+            background: "linear-gradient(#cef, transparent)",
+            marginTop: "16px",
+            padding: "8px",
+          }}
+        >
+          <div>Spacer : {spacer.id}</div>
+          <div>From: {spacer.countryEmoji}</div>
+          <div>Win status: {readWinStatus(spacer.winStatus)}</div>
+        </div>
       </div>
     ))
   ) : (

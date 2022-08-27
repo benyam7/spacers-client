@@ -2,7 +2,6 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 64px;
 }
 
 .dataContainer {
@@ -13,9 +12,11 @@
 }
 
 .header {
+  margin-top: 64px;
   text-align: center;
   font-size: 32px;
   font-weight: 600;
+  color: gray;
 }
 
 .bio {
@@ -27,7 +28,10 @@
 .joinSpaceButton {
   cursor: pointer;
   margin-top: 16px;
-  padding: 8px;
+  padding: 28px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 15px;
+  background: linear-gradient(#00d0ff, transparent);
 }
+
+/* 00d0ff */
