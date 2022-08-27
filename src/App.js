@@ -4,6 +4,8 @@ import Picker from "emoji-picker-react";
 import "./App.css";
 import "./loading.css";
 import abi from "./utils/JoinSpace.json";
+import RocketScene from "./RocketScene";
+
 const GOERLI = "goerli";
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState();
@@ -245,6 +247,9 @@ export default function App() {
             pickerStyle={{ width: "100%", marginTop: 40, marginBottom: 40 }}
           />
         )}
+
+        <RocketScene />
+
         {currentAccount && (
           <>
             <div>Spacers in the club!</div>
